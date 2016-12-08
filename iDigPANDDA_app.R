@@ -29,6 +29,14 @@ if (require("plyr",warn.conflicts=FALSE)==FALSE) {
     library("plyr");
     }
 
+# Start a cluster for multicore, 4 by default or higher if passed as command line argument
+CommandArgument<-commandArgs(TRUE)
+if (length(CommandArgument)==0) {
+    Cluster<-makeCluster(3)
+    } else {
+    Cluster<-makeCluster(as.numeric(CommandArgument[1]))
+    }
+
 # Establish the postgresql connection
 # Download the config file
 Credentials<-as.matrix(read.table("Credentials.yml",row.names=1))
@@ -54,6 +62,8 @@ StatsMatrix["Initial","GDD_Documents"]<-length(unique(DeepDiveData[,"docid"]))
 
 # Merge sentences into single document strings
 DocumentWords<-tapply(DeepDiveData[,"words"],DeepDiveData[,"docid"],function(x) paste(x,collapse=" "))
+# Clean the punctuation
+DocumentWords<-parSapply(Cluster,DocumentWords,function(x) gsub("[[:punct:]]", " ",x))
 
 #############################################################################################################
 ######################################## MATCH SPECIMENS-REFS FUNCTIONS #####################################
