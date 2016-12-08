@@ -46,20 +46,22 @@ Connection <- dbConnect(Driver, dbname = Credentials["database:",], host = Crede
 # Load the museum specimen information
 
 # Load DeepDive Data from postgresql
-DeepDiveData<-dbGetQuery(Connection,"SELECT docid, sentid, words FROM nlp_sentences_352")
+DeepDiveData<-dbGetQuery(Connection,"SELECT docid,words FROM nlp_sentences_352")
 
 # Record the input and output stats
 StatsMatrix<-matrix(NA,nrow=2,ncol=2,dimnames=list(c("Initial","Final"),c("GDD_Documents","IDIG_Museums")))
 StatsMatrix["Initial","GDD_Documents"]<-length(unique(DeepDiveData[,"docid"]))
 
-# Trim the data for simplicity
-Documents<-tapply(DeepDiveData[,"words"],DeepDiveData[,"docid"],function(x) paste(x,sep=" "))
+# Merge sentences into single document strings
+DocumentWords<-tapply(DeepDiveData[,"words"],DeepDiveData[,"docid"],function(x) paste(x,collapse=" "))
 
 #############################################################################################################
 ######################################## MATCH SPECIMENS-REFS FUNCTIONS #####################################
 #############################################################################################################
 # Because of memory constraints we do not use a more elegant split()-family solution - e.g., by() or dlply()
-# A function to iteratively look 
+
+# A function to iteratively look within each document for museum mentions
+
 
 
 
